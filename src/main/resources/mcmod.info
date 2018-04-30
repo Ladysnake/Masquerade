@@ -1,0 +1,21 @@
+[
+  {
+    "modid": "masquerade",
+    "name": "Masquerade",
+    "description": "A mod adding decorative masks to the game. Masks hide players' nameplates when worn.",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "",
+    "updateUrl": "",
+    "authorList": [
+      "Pyrofab",
+      "RiverLeviathan"
+    ],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": [
+      ""
+    ]
+  }
+]
