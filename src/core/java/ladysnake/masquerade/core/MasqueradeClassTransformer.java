@@ -1,7 +1,8 @@
 package ladysnake.masquerade.core;
 
-import ladysnake.masquerade.PlayerGetRenderNameEvent;
-import net.minecraft.entity.player.EntityPlayer;
+import ladysnake.masquerade.CanRenderNameEvent;
+import net.minecraft.client.renderer.entity.RenderLivingBase;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
@@ -21,24 +22,34 @@ public class MasqueradeClassTransformer implements IClassTransformer {
              * This hook is needed to reliably control the player's nameplate display,
              * as vanilla always render it unless the player is fully invisible.
              */
-            case "net.minecraft.entity.player.EntityPlayer":
+            case "net.minecraft.client.renderer.entity.RenderLivingBase":
                 return transformClass(basicClass, classNode -> {
-                    // func_94059_bO <=> getAlwaysRenderNameTagForRender
-                    String name = FMLDeobfuscatingRemapper.INSTANCE.mapMethodName("net/minecraft/entity/player/EntityPlayer", "func_94059_bO", "()Z");
+                    // RenderLivingBase#canRenderName
+                    String desc = "(Lnet/minecraft/entity/EntityLivingBase;)Z";
+                    String name = FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(
+                            "net/minecraft/client/renderer/entity/RenderLivingBase",
+                            "func_177070_b",
+                            desc
+                    );
                     for (MethodNode methodNode : classNode.methods) {
-                        if (methodNode.name.equals(name) && methodNode.desc.equals("()Z")) {
-                            for (int i = 0; i < methodNode.instructions.size(); i++) {
-                                AbstractInsnNode insnNode = methodNode.instructions.get(i);
-                                if (insnNode.getOpcode() == Opcodes.IRETURN) {
-                                    InsnList insnList = new InsnList();
-                                    // pop the previous value
-                                    insnList.add(new InsnNode(Opcodes.POP));
-                                    insnList.add(new VarInsnNode(Opcodes.ALOAD, 0));
-                                    insnList.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "ladysnake/masquerade/core/MasqueradeClassTransformer", "hook", "(Lnet/minecraft/entity/player/EntityPlayer;)Z;", false));
-                                    i += insnList.size();
-                                    methodNode.instructions.insertBefore(insnNode, insnList);
-                                }
-                            }
+                        if (methodNode.name.equals(name) && methodNode.desc.equals(desc)) {
+                            System.out.println("Found " + name + " !");
+                            InsnList preIns = new InsnList();
+                            preIns.add(new VarInsnNode(Opcodes.ALOAD, 0));    // this renderer
+                            preIns.add(new VarInsnNode(Opcodes.ALOAD, 1));    // the rendered entity
+                            preIns.add(new MethodInsnNode(
+                                    Opcodes.INVOKESTATIC,
+                                    "ladysnake/masquerade/core/MasqueradeClassTransformer",
+                                    "hook",
+                                    "(Lnet/minecraft/client/renderer/entity/RenderLivingBase;Lnet/minecraft/entity/EntityLivingBase;)Z",
+                                    false
+                            ));
+                            LabelNode lbl = new LabelNode();
+                            preIns.add(new JumpInsnNode(Opcodes.IFEQ, lbl));
+                            preIns.add(new InsnNode(Opcodes.ICONST_0));
+                            preIns.add(new InsnNode(Opcodes.IRETURN));
+                            preIns.add(lbl);
+                            methodNode.instructions.insert(preIns);
                         }
                     }
                 });
@@ -53,12 +64,12 @@ public class MasqueradeClassTransformer implements IClassTransformer {
 
         transformer.accept(classNode);
 
-        ClassWriter writer = new SafeClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
+        ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
         classNode.accept(writer);
         return writer.toByteArray();
     }
 
-    public static boolean hook(EntityPlayer player) {
-        return !MinecraftForge.EVENT_BUS.post(new PlayerGetRenderNameEvent(player));
+    public static boolean hook(RenderLivingBase renderer, EntityLivingBase entity) {
+        return MinecraftForge.EVENT_BUS.post(new CanRenderNameEvent(renderer, entity));
     }
 }

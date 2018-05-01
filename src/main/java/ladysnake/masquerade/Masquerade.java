@@ -17,6 +17,7 @@ import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLFingerprintViolationEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -24,6 +25,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.lang.ref.WeakReference;
 import java.util.UUID;
@@ -31,13 +34,15 @@ import java.util.UUID;
 @Mod(
         modid = Masquerade.MOD_ID,
         name = Masquerade.MOD_NAME,
-        version = Masquerade.VERSION
+        version = "@VERSION@",
+        certificateFingerprint = "@FINGERPRINT@"
 )
 public class Masquerade {
 
     public static final String MOD_ID = "masquerade";
     public static final String MOD_NAME = "Masquerade";
-    public static final String VERSION = "0.0.1.0";
+
+    public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
     /**
      * This is the instance of your mod as created by Forge. It will never be null.
@@ -76,6 +81,11 @@ public class Masquerade {
 
     }
 
+    @Mod.EventHandler
+    public void onFingerprintViolation(FMLFingerprintViolationEvent event) {
+        LOGGER.warn("Invalid fingerprint detected! The file " + event.getSource().getName() + " may have been tampered with. This version will NOT be supported by the author!");
+    }
+
     /**
      * Forge will automatically look up and bind items to the fields in this class
      * based on their registry name.
@@ -96,7 +106,7 @@ public class Masquerade {
         @SubscribeEvent
         public static void addItems(RegistryEvent.Register<Item> event) {
             for (Masques masque : Masques.values())
-                event.getRegistry().register(new ItemMasque(ItemArmor.ArmorMaterial.LEATHER, 1, masque).setCreativeTab(CREATIVE_TAB).setRegistryName(MOD_ID, "mask_" + masque));
+                event.getRegistry().register(new ItemMasque(ItemArmor.ArmorMaterial.LEATHER, 1, masque).setCreativeTab(CREATIVE_TAB).setRegistryName(MOD_ID, "mask_" + masque).setUnlocalizedName(MOD_ID + ":" + masque));
         }
 
         @SubscribeEvent

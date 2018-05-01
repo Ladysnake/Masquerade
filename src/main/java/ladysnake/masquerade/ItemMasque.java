@@ -6,8 +6,10 @@ import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+@Mod.EventBusSubscriber(modid = Masquerade.MOD_ID)
 public class ItemMasque extends ItemArmor {
     public static final String TAG_MASQUE = Masquerade.MOD_ID + ":masque";
     private Masques masque;
@@ -22,8 +24,8 @@ public class ItemMasque extends ItemArmor {
     }
 
     @SubscribeEvent
-    public void onPlayerGetRenderName(PlayerGetRenderNameEvent event) {
-        if (getMasque(event.getEntityPlayer().getItemStackFromSlot(EntityEquipmentSlot.HEAD)) != Masques.NONE) {
+    public static void onCanRenderName(CanRenderNameEvent event) {
+        if (getMasque(event.getEntity().getItemStackFromSlot(EntityEquipmentSlot.HEAD)) != Masques.NONE) {
             event.setCanceled(true);
         }
     }
