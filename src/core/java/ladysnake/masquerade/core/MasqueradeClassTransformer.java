@@ -33,7 +33,6 @@ public class MasqueradeClassTransformer implements IClassTransformer {
                     );
                     for (MethodNode methodNode : classNode.methods) {
                         if (methodNode.name.equals(name) && methodNode.desc.equals(desc)) {
-                            System.out.println("Found " + name + " !");
                             InsnList preIns = new InsnList();
                             preIns.add(new VarInsnNode(Opcodes.ALOAD, 0));    // this renderer
                             preIns.add(new VarInsnNode(Opcodes.ALOAD, 1));    // the rendered entity
@@ -69,6 +68,7 @@ public class MasqueradeClassTransformer implements IClassTransformer {
         return writer.toByteArray();
     }
 
+    @SuppressWarnings("unused") // this is called by ASM
     public static boolean hook(RenderLivingBase renderer, EntityLivingBase entity) {
         return MinecraftForge.EVENT_BUS.post(new CanRenderNameEvent(renderer, entity));
     }

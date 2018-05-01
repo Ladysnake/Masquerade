@@ -105,8 +105,9 @@ public class Masquerade {
          */
         @SubscribeEvent
         public static void addItems(RegistryEvent.Register<Item> event) {
-            for (Masques masque : Masques.values())
-                event.getRegistry().register(new ItemMasque(ItemArmor.ArmorMaterial.LEATHER, 1, masque).setCreativeTab(CREATIVE_TAB).setRegistryName(MOD_ID, "mask_" + masque).setUnlocalizedName(MOD_ID + ":" + masque));
+            Masques[] masques = Masques.values();
+            for (int i = 1; i < masques.length; i++)    // don't register an item for the "none" mask
+                event.getRegistry().register(new ItemMasque(ItemArmor.ArmorMaterial.LEATHER, 1, masques[i]).setCreativeTab(CREATIVE_TAB).setRegistryName(MOD_ID, "mask_" + masques[i]).setUnlocalizedName(MOD_ID + ":" + masques[i]));
         }
 
         @SubscribeEvent
