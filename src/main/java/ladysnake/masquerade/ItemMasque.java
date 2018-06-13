@@ -55,8 +55,8 @@ public class ItemMasque extends Item {
     }
 
     @SubscribeEvent
-    public static void onCanRenderName(CanRenderNameEvent event) {
-        if (getMasque(event.getEntity().getItemStackFromSlot(EntityEquipmentSlot.HEAD)) != Masques.NONE) {
+    public static void onSpecialsPre(RenderLivingEvent.Specials.Pre event) {
+        if (getMasque(event.getEntity().getItemStackFromSlot(EntityEquipmentSlot.HEAD)) != Masque.NONE) {
             event.setCanceled(true);
         }
     }
