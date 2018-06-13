@@ -57,7 +57,7 @@ public class RecipeMasque extends IForgeRegistryEntry.Impl<IRecipe> implements I
         }
         if (!helmet.isEmpty() && !mask.isEmpty()) {
             ItemStack result = helmet.copy();
-            Masques appliedMask = ItemMasque.getMasque(mask);
+            Masque appliedMask = ItemMasque.getMasque(mask);
             ItemMasque.setMasque(result, appliedMask);
             return result;
         }

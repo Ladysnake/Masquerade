@@ -3,16 +3,18 @@ package ladysnake.masquerade;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -22,6 +24,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -70,7 +73,7 @@ public class Masquerade {
      */
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
-        MinecraftForge.EVENT_BUS.register(ModItems.MASQUE);
+
     }
 
     /**
@@ -100,19 +103,27 @@ public class Masquerade {
      */
     @Mod.EventBusSubscriber(modid = MOD_ID)
     public static class ObjectRegistryHandler {
-        /**
-         * Listen for the register event for creating custom items
-         */
-        @SubscribeEvent
-        public static void addItems(RegistryEvent.Register<Item> event) {
-            Masques[] masques = Masques.values();
-            for (int i = 1; i < masques.length; i++)    // don't register an item for the "none" mask
-                event.getRegistry().register(new ItemMasque(ItemArmor.ArmorMaterial.LEATHER, 1, masques[i]).setCreativeTab(CREATIVE_TAB).setRegistryName(MOD_ID, "mask_" + masques[i]).setUnlocalizedName(MOD_ID + ":" + masques[i]));
+
+        public static Item createMask(ResourceLocation maskId) {
+            ItemMasque ret = new ItemMasque(maskId);
+            ret.setCreativeTab(CREATIVE_TAB);
+            ret.setRegistryName(maskId);
+            return ret;
         }
 
         @SubscribeEvent
         public static void addRecipes(RegistryEvent.Register<IRecipe> event) {
             event.getRegistry().register(new RecipeMasque().setRegistryName("mask"));
+        }
+
+        @SubscribeEvent
+        public static void registerModels(ModelRegistryEvent event) {
+            for (Masque m : Masque.REGISTRY) {
+                Item masque = ForgeRegistries.ITEMS.getValue(m.getRegistryName());
+                if (masque != null) {
+                    ModelLoader.setCustomModelResourceLocation(masque, 0, new ModelResourceLocation(m.getModelLocation()));
+                }
+            }
         }
     }
 
