@@ -2,5 +2,7 @@
 	"registryName": "hoxton",
 	"unlocalizedName": "hoxton",
 	"model": "masquerade:masques/hoxton",
-	"tooltipLines": "\"Alright fellas, let's do this.\""
+	"tooltipLines": [
+		"\"Alright fellas, let's do this.\""
+	]
 }

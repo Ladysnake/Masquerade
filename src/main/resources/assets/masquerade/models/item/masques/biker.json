@@ -1,7 +1,7 @@
 {
 	"textures": {
-		"0": "masquerade:masques/dallas",
-		"particle": "masquerade:masques/dallas"
+		"0": "masquerade:masques/biker",
+		"particle": "masquerade:masques/biker"
 	},
 	"elements": [
 		{
@@ -64,11 +64,12 @@
 		"fixed": {
 			"scale": [2, 2, 2],
 			"rotation": [0, 0, 0],
-			"translation": [0, 7, 0]
+			"translation": [0, 7, 2]
 		},
 		"gui": {
-			"rotation": [10, -170, 0],
-			"translation": [0, 3.5, 0]
+			"rotation": [0, 0, 0],
+			"translation": [0, 4.5, 0],
+			"scale": [1.25, 1.25, 1.25]
 		}
 	}
 }

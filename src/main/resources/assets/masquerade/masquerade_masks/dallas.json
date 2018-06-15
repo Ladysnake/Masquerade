@@ -2,5 +2,7 @@
 	"registryName": "dallas",
 	"unlocalizedName": "dallas",
 	"model": "masquerade:masques/dallas",
-	"tooltipLines": "\"Time to break a little bad.\""
+	"tooltipLines": [
+		"\"Time to break a little bad.\""
+	]
 }
